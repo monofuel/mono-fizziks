@@ -3,10 +3,8 @@ package net.japura.monofuel.testgame.core;
 import static playn.core.PlayN.*;
 
 import java.util.ArrayList;
-import java.util.EventListener;
-import java.util.EventObject;
 
-import javax.swing.event.EventListenerList;
+import net.japura.monofuel.testgame.core.MenuBar.Button;
 
 import playn.core.Graphics;
 import playn.core.Image;
@@ -15,7 +13,7 @@ import playn.core.ImageLayer;
 
 public class MenuBar {
 	
-	ArrayList<Button> icons = new ArrayList();
+	ArrayList<Button> icons = new ArrayList<Button>();
 	Image buttonBG;
 	ImageLayer iconsLayer;
 	ImageLayer buttonBGLayer;
@@ -44,8 +42,8 @@ public class MenuBar {
 		//adds the menu bar to rendering
 		graphics().rootLayer().add(buttonBGLayer);
 		
-		icons.add(new boxButton("Box", assets().getImage("boxButton.png")));
-		icons.add(new weldButton("Weld", assets().getImage("weldButton.png")));
+		icons.add(new BoxButton("Box", TestGame.boxButtonImage));
+		icons.add(new WeldButton("Weld", TestGame.weldButtonImage));
 		
 		
 		for (Button item : icons) {
@@ -72,9 +70,9 @@ public class MenuBar {
 		}
 		
 	}
-	public class boxButton extends Button {
+	public class BoxButton extends Button {
 
-		public boxButton(String name, Image icon) {
+		public BoxButton(String name, Image icon) {
 			super(name, icon);
 			
 		}
@@ -83,9 +81,9 @@ public class MenuBar {
 		}
 	}
 	
-	public class weldButton extends Button {
+	public class WeldButton extends Button {
 
-		public weldButton(String name, Image icon) {
+		public WeldButton(String name, Image icon) {
 			super(name, icon);
 			
 		}
@@ -100,6 +98,21 @@ public class MenuBar {
 	}
 	
 	public void click(float x, float y) {
+		for (Button icon : icons) {
+			if (checkCollision(new float[] {x,y}, icon.layer() )) {
+				icon.onClick();
+			}
+		}
+	}
+	
+	public boolean checkCollision(float[] coord, ImageLayer layer) {
+		if (coord[0] > layer.originX() &&
+			coord[1] > layer.originY() &&
+			coord[0] < layer.originX()+layer.width() &&
+			coord[1] < layer.originY()+layer.height()) {
+			return true;
+		}
+		return false;
 		
 	}
 	

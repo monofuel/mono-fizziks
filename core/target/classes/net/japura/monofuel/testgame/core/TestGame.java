@@ -12,6 +12,7 @@ import playn.core.Mouse;
 import playn.core.Pointer;
 import playn.core.Pointer.Adapter;
 import playn.core.Pointer.Event;
+//import org.jbox2d.*;
 
 public class TestGame implements Game {
 	
@@ -28,6 +29,8 @@ public class TestGame implements Game {
 	  boolean loaded = false;
 	  static int mode;
 	  static boolean horizontal = true;
+	  public static Image boxButtonImage = assets().getImage("boxButton.png");
+	  public static Image weldButtonImage = assets().getImage("weldButton.png");
 	  
 	  ArrayList<ArrayList<ImageLayer>> fgLayer = new ArrayList<ArrayList<ImageLayer>>();
 	

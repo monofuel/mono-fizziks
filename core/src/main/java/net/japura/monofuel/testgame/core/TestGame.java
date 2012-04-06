@@ -12,7 +12,7 @@ import playn.core.Mouse;
 import playn.core.Pointer;
 import playn.core.Pointer.Adapter;
 import playn.core.Pointer.Event;
-import org.jbox2d.*;
+//import org.jbox2d.*;
 
 public class TestGame implements Game {
 	

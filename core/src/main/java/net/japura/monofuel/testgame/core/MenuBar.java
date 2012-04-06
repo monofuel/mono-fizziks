@@ -42,8 +42,8 @@ public class MenuBar {
 		//adds the menu bar to rendering
 		graphics().rootLayer().add(buttonBGLayer);
 		
-		icons.add(new BoxButton("Box", assets().getImage("boxButton.png")));
-		icons.add(new WeldButton("Weld", assets().getImage("weldButton.png")));
+		icons.add(new BoxButton("Box", assets().getImage("images/boxButton.png")));
+		icons.add(new WeldButton("Weld", assets().getImage("images/weldButton.png")));
 		
 		
 		for (Button item : icons) {
