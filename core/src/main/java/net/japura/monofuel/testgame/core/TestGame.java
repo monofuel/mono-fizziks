@@ -37,6 +37,7 @@ public class TestGame implements Game {
 	// create and add background image layer
 	Image bgImage = assets().getImage("images/bg.png");
 	ImageLayer bgLayer = graphics().createImageLayer(bgImage);
+	bgLayer.setDepth(0);
 	graphics().rootLayer().add(bgLayer);
 	
 	//creates a menu
@@ -53,6 +54,7 @@ public class TestGame implements Game {
     		
     		//adds a grass tile to each ImageLayer in the array
     		fgLayer.get(x).add(graphics().createImageLayer(grassTile));
+    		fgLayer.get(x).get(y).setDepth(1);
     		
     		//sets the default scale and location of each tile
     		fgLayer.get(x).get(y).setTranslation((16*scale*x)+pan[0],(16*scale*y)+pan[1]);

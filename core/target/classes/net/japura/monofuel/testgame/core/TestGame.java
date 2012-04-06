@@ -29,8 +29,6 @@ public class TestGame implements Game {
 	  boolean loaded = false;
 	  static int mode;
 	  static boolean horizontal = true;
-	  public static Image boxButtonImage = assets().getImage("boxButton.png");
-	  public static Image weldButtonImage = assets().getImage("weldButton.png");
 	  
 	  ArrayList<ArrayList<ImageLayer>> fgLayer = new ArrayList<ArrayList<ImageLayer>>();
 	
@@ -39,6 +37,7 @@ public class TestGame implements Game {
 	// create and add background image layer
 	Image bgImage = assets().getImage("images/bg.png");
 	ImageLayer bgLayer = graphics().createImageLayer(bgImage);
+	bgLayer.setDepth(0);
 	graphics().rootLayer().add(bgLayer);
 	
 	//creates a menu
@@ -55,6 +54,7 @@ public class TestGame implements Game {
     		
     		//adds a grass tile to each ImageLayer in the array
     		fgLayer.get(x).add(graphics().createImageLayer(grassTile));
+    		fgLayer.get(x).get(y).setDepth(1);
     		
     		//sets the default scale and location of each tile
     		fgLayer.get(x).get(y).setTranslation((16*scale*x)+pan[0],(16*scale*y)+pan[1]);
@@ -103,10 +103,11 @@ public class TestGame implements Game {
     		deltaY = event.y();
     	}
     	
-    	public void onPointerStop(Pointer.Event event) {
+    	public void onPointerEnd(Pointer.Event event) {
     		do {
     		if (horizontal) {
     			if (event.x() > gameMenu.width()){
+    				System.out.println("in-game");
     				break;
     			}
     		} else {
