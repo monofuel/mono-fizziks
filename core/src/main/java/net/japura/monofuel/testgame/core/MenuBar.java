@@ -9,6 +9,7 @@ import net.japura.monofuel.testgame.core.MenuBar.Button;
 import playn.core.Graphics;
 import playn.core.Image;
 import playn.core.ImageLayer;
+import playn.core.Layer;
 
 
 public class MenuBar {
@@ -45,9 +46,10 @@ public class MenuBar {
 		icons.add(new BoxButton("Box", assets().getImage("images/boxButton.png")));
 		icons.add(new WeldButton("Weld", assets().getImage("images/weldButton.png")));
 		
-		
+		int itin = 1;
 		for (Button item : icons) {
-			item.layer().setTranslation(TestGame.HEIGHT/icons.size(), 10);
+			item.layer().setTranslation(10,((TestGame.HEIGHT-item.layer().scaledHeight())/(icons.size()+1))*itin);
+			itin++;
 			graphics().rootLayer().add(item.layer());
 		}
 	}
@@ -56,17 +58,21 @@ public class MenuBar {
 	
 	public class Button {
 		ImageLayer iconImage;
+		String name;
 		
-		public Button(String name, Image icon) {
+		public Button(String thisName, Image icon) {
 			iconImage = graphics().createImageLayer(icon);
+			name = thisName;
 		}
 		
-		public void onClick() {
-			
-		}
+		public void onClick() {}
 		
 		public ImageLayer layer() {
 			return iconImage;
+		}
+		
+		public String getName() {
+			return name;
 		}
 		
 	}
@@ -101,17 +107,17 @@ public class MenuBar {
 		for (Button icon : icons) {
 			if (checkCollision(new float[] {x,y}, icon.layer() )) {
 				icon.onClick();
+				//break;
 			}
 		}
 	}
 	
 	public boolean checkCollision(float[] coord, ImageLayer layer) {
-		if (coord[0] > layer.originX() &&
-			coord[1] > layer.originY() &&
-			coord[0] < layer.originX()+layer.width() &&
-			coord[1] < layer.originY()+layer.height()) {
+		
+		if (Layer.Util.hitTest(layer, coord[0],coord[1])){
 			return true;
 		}
+		
 		return false;
 		
 	}

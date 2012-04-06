@@ -101,10 +101,11 @@ public class TestGame implements Game {
     		deltaY = event.y();
     	}
     	
-    	public void onPointerStop(Pointer.Event event) {
+    	public void onPointerEnd(Pointer.Event event) {
     		do {
     		if (horizontal) {
     			if (event.x() > gameMenu.width()){
+    				System.out.println("in-game");
     				break;
     			}
     		} else {
