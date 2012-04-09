@@ -13,18 +13,19 @@
   <packaging>jar</packaging>
   <name>TestGame Core</name>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.googlecode.playn</groupId>
-      <artifactId>playn-core</artifactId>
-      <version>${playn.version}</version>
-    </dependency>
-    <dependency>
-    	<groupId>com.googlecode.playn</groupId>
-    	<artifactId>playn-jbox2d</artifactId>
-    	<version>${playn.version}</version>
-    </dependency>
-  </dependencies>
+ 	  <dependencies>
+		<dependency>
+		  <groupId>com.googlecode.playn</groupId>
+		  <artifactId>playn-core</artifactId>
+		  <version>${playn.version}</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>com.googlecode.playn</groupId>
+		  <artifactId>playn-jbox2d</artifactId>
+		  <version>${playn.version}</version>
+		</dependency>
+	  </dependencies> 
 
   <build>
     <plugins>

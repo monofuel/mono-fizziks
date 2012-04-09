@@ -4,13 +4,9 @@ import static playn.core.PlayN.*;
 
 import java.util.ArrayList;
 
-import net.japura.monofuel.testgame.core.MenuBar.Button;
-
-import playn.core.Graphics;
 import playn.core.Image;
 import playn.core.ImageLayer;
 import playn.core.Layer;
-
 
 public class MenuBar {
 	
