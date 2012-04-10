@@ -54,7 +54,7 @@ public class TestGame implements Game {
     
     //loads grass.png
     grassTile = assets().getImage("images/grass.png");
-	
+
     /*
     //grid[] is the x and y sizes of the array
     for (int x = 0; x < grid[0]; x++){
@@ -109,6 +109,8 @@ public class TestGame implements Game {
     		//compares current location with last location and pans
     		pan[0] += event.x()-deltaX;
     		pan[1] += event.y()-deltaY;
+    		
+    		createBox(event.x(),event.y());
     		
     		
     		//sets new delta for next update
@@ -182,6 +184,8 @@ public class TestGame implements Game {
   
   //public void weldBox(Shape[] boxlist) {}
 
+  float testItin = 0;
+  
   @Override
   public void paint(float alpha) {
 	  if (loaded) { //check if the init has finished

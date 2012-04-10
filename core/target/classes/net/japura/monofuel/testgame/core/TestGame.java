@@ -17,8 +17,8 @@ import org.jbox2d.dynamics.*;
 
 public class TestGame implements Game {
 	
-	  public static int WIDTH = 1024;
-	  public static int HEIGHT = 768;
+	  public static int WIDTH = 1440;
+	  public static int HEIGHT = 900;
 	  float scale = 2;
 	  
 	  final int[] grid = new int[] {10,10};
@@ -54,7 +54,7 @@ public class TestGame implements Game {
     
     //loads grass.png
     grassTile = assets().getImage("images/grass.png");
-	
+
     /*
     //grid[] is the x and y sizes of the array
     for (int x = 0; x < grid[0]; x++){
@@ -110,6 +110,9 @@ public class TestGame implements Game {
     		pan[0] += event.x()-deltaX;
     		pan[1] += event.y()-deltaY;
     		
+    		createBox(event.x(),event.y());
+    		
+    		
     		//sets new delta for next update
     		deltaX = event.x();
     		deltaY = event.y();
@@ -141,12 +144,11 @@ public class TestGame implements Game {
     world = new World(gravity, doSleep);
 
     //creates object
-	shapeList.add(new Shape(world, "STATIC",new float[] {64,64}, new float[] {300,500}));
+	shapeList.add(new Shape(world, "STATIC",new float[] {WIDTH,32}, new float[] {WIDTH/2,HEIGHT-32}));
 	shapeList.get(0).createLayer(graphics().createImageLayer(grassTile),1);
 	
 	
-	//sets the default scale and location of each tile
-	shapeList.get(0).updateLocation();
+	//sets the default scale and location of the first square
 	graphics().rootLayer().add(shapeList.get(0).getLayer());
     
     //sets the load bool to true so the paint and update methods know we're ready
@@ -173,19 +175,27 @@ public class TestGame implements Game {
 	  
 	  int index = shapeList.size();
 	  
-	  shapeList.add(new Shape(world, "DYNAMIC",new float[] {32,32},new float[] {x,y}));
+	  shapeList.add(new Shape(world, "DYNAMIC",new float[] {32,32},new float[] {x+16,y+16}));
 	  shapeList.get(index).createLayer(graphics().createImageLayer(grassTile),1);
 		
 	  //sets the default scale and location of each tile
-	  shapeList.get(index).updateLocation();
 	  graphics().rootLayer().add(shapeList.get(index).getLayer());
   }
   
   //public void weldBox(Shape[] boxlist) {}
 
+  float testItin = 0;
+  
   @Override
   public void paint(float alpha) {
-	  //nothing needed
+	  if (loaded) { //check if the init has finished
+
+		  //paints every block  
+		  for (Shape item : shapeList) {
+			  item.paint(alpha);
+		  }
+		  
+	  }
   }
 
   @Override
@@ -195,9 +205,9 @@ public class TestGame implements Game {
 		  //step world physics
 		  world.step(delta/1000, 1,1);
 		  
-		  //updates every block  
+		//updates every block  
 		  for (Shape item : shapeList) {
-			  item.updateLocation();
+			  item.updateLocation(delta);
 		  }
 		  
 	  }
