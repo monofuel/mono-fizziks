@@ -17,8 +17,8 @@ import org.jbox2d.dynamics.*;
 
 public class TestGame implements Game {
 	
-	  public final static float WIDTH = graphics().width();
-	  public final static float HEIGHT = graphics().height();
+	  public static int WIDTH = 1024;
+	  public static int HEIGHT = 768;
 	  float scale = 2;
 	  
 	  final int[] grid = new int[] {10,10};
@@ -33,15 +33,18 @@ public class TestGame implements Game {
 	  
 	  World world;
 	  Image grassTile;
-
 	  
 	  ArrayList<Shape> shapeList = new ArrayList<Shape>();
 	
   @Override
   public void init() {
+	  
+	graphics().setSize(WIDTH, HEIGHT);
+	  
 	// create and add background image layer
 	Image bgImage = assets().getImage("images/bg.png");
 	ImageLayer bgLayer = graphics().createImageLayer(bgImage);
+	bgLayer.setScale(HEIGHT/bgLayer.height(), WIDTH/bgLayer.width());
 	bgLayer.setDepth(0);
 	graphics().rootLayer().add(bgLayer);
 	
@@ -51,7 +54,7 @@ public class TestGame implements Game {
     
     //loads grass.png
     grassTile = assets().getImage("images/grass.png");
-    
+	
     /*
     //grid[] is the x and y sizes of the array
     for (int x = 0; x < grid[0]; x++){
@@ -136,25 +139,9 @@ public class TestGame implements Game {
     boolean doSleep = true;
     
     world = new World(gravity, doSleep);
-    /*
-    BodyDef groundBodyDef = new BodyDef();
-    groundBodyDef.type = BodyType.STATIC;
-    groundBodyDef.position.x = 200;
-    groundBodyDef.position.y = 300;
-    
-    Body body = world.createBody(groundBodyDef);
-    PolygonShape shape = new PolygonShape();
-    shape.setAsBox(5, 2, new Vec2(5,2), 0);
-    
-    FixtureDef fd = new FixtureDef();
-    fd.shape = shape;
-    fd.density = 1000f;
-    fd.restitution = 1f;
-    body.createFixture(fd);
-	*/
-    
-    //adds a grass tile to each ImageLayer in the array
-	shapeList.add(new Shape(world, "STATIC",new float[] {2,2},new float[] {300,200}));
+
+    //creates object
+	shapeList.add(new Shape(world, "STATIC",new float[] {64,64}, new float[] {300,500}));
 	shapeList.get(0).createLayer(graphics().createImageLayer(grassTile),1);
 	
 	
@@ -183,10 +170,10 @@ public class TestGame implements Game {
   }
   
   public void createBox(float x, float y) {
-	  System.out.println("creating box at:" + x + "," + y);
+	  
 	  int index = shapeList.size();
 	  
-	  shapeList.add(new Shape(world, "DYNAMIC",new float[] {2,2},new float[] {x,y}));
+	  shapeList.add(new Shape(world, "DYNAMIC",new float[] {32,32},new float[] {x,y}));
 	  shapeList.get(index).createLayer(graphics().createImageLayer(grassTile),1);
 		
 	  //sets the default scale and location of each tile
@@ -194,47 +181,31 @@ public class TestGame implements Game {
 	  graphics().rootLayer().add(shapeList.get(index).getLayer());
   }
   
-  //public void weldBox(Shape[] boxlist) {
-	  
-  //}
+  //public void weldBox(Shape[] boxlist) {}
 
   @Override
   public void paint(float alpha) {
-	  if (loaded) { // check if the init has finished
-		  //gameMenu.update();
-	  }
+	  //nothing needed
   }
 
   @Override
   public void update(float delta) {
 	  if (loaded) { //check if the init has finished
 
+		  //step world physics
 		  world.step(delta/1000, 1,1);
 		  
-		  //updates every block
-		  
+		  //updates every block  
 		  for (Shape item : shapeList) {
 			  item.updateLocation();
 		  }
 		  
-		  //iterate through every x and y block
-		  /*
-		  for (int x = 0; x < grid[0]; x++){
-		    	for (int y = 0; y < grid[1]; y++){
-		    		
-		    		//if the scale or panning location has changed, adjust it
-		    		fgLayer.get(x).get(y).setTranslation((16*scale*x)+pan[0],(16*scale*y)+pan[1]);
-		    		
-		    		//TODO- check if scale has changed before setting scale
-		    		fgLayer.get(x).get(y).setScale(scale);
-		    	}
-		    }*/
 	  }
   }
 
   @Override
   public int updateRate() {
-    return 25;
+    return 5; //milliseconds to wait each update step
   }
   
 }
