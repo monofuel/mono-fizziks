@@ -110,6 +110,7 @@ public class TestGame implements Game {
     		pan[0] += event.x()-deltaX;
     		pan[1] += event.y()-deltaY;
     		
+    		
     		//sets new delta for next update
     		deltaX = event.x();
     		deltaY = event.y();
@@ -141,11 +142,11 @@ public class TestGame implements Game {
     world = new World(gravity, doSleep);
 
     //creates object
-	shapeList.add(new Shape(world, "STATIC",new float[] {512,32}, new float[] {500,500}));
+	shapeList.add(new Shape(world, "STATIC",new float[] {WIDTH,32}, new float[] {WIDTH/2,HEIGHT-32}));
 	shapeList.get(0).createLayer(graphics().createImageLayer(grassTile),1);
 	
 	
-	//sets the default scale and location of each tile
+	//sets the default scale and location of the first square
 	graphics().rootLayer().add(shapeList.get(0).getLayer());
     
     //sets the load bool to true so the paint and update methods know we're ready

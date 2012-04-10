@@ -24,10 +24,10 @@ public class Shape {
 	float[] oldLocation;
 	
 	//set scale of pixels to jbox2d grid
-	float scale = 0.5f;
+	float scale = 0.1f;
 	
 	public Shape(World world,String type,float[] size, float[] location) {
-		System.out.println("creating box at:" + location[0] + "," + location[1]+ "with size of: " + size[0] + "," + size[1]);
+		//System.out.println("creating box at:" + location[0] + "," + location[1]+ "with size of: " + size[0] + "," + size[1]);
 		
 		bodySize = new float[] {size[0]*scale,size[1]*scale};
 		bodyLocation = new float[] {location[0]*scale, location[1]*scale};
@@ -59,10 +59,11 @@ public class Shape {
 	public void createLayer(ImageLayer createImage,int depth) {
 		image = createImage;
 		image.setDepth(depth);
-		//image.setSize(bodySize[0]/scale,bodySize[1]/scale);
+		//image.setScale(scale);
 		image.setScale((bodySize[0]/scale)/image.width(),(bodySize[1]/scale)/image.height());
-		image.setOrigin(image.width() / 2f, image.height() / 2f);
+		//image.setOrigin((bodySize[0]/scale)/2,(bodySize[1]/scale)/2);
 		image.setTranslation(body.getPosition().x/scale, body.getPosition().y/scale);
+		image.setOrigin((bodySize[0]/scale)/2,(bodySize[1]/scale)/2);
 		
 	}
 	
@@ -83,9 +84,10 @@ public class Shape {
 	    image.setTranslation(x, y);
 	    image.setRotation(a);
 	    
+	    System.out.println(image.originX() + "," + image.originY());
 		
-		System.out.print((((body.getPosition().x/scale) * alpha) + ((oldLocation[0]/scale) * (1f - alpha))));
-		System.out.println("," +(((body.getPosition().y/scale) * alpha) + ((oldLocation[1]/scale) * (1f - alpha))));
+		//System.out.print((((body.getPosition().x/scale) * alpha) + ((oldLocation[0]/scale) * (1f - alpha))));
+		//System.out.println("," +(((body.getPosition().y/scale) * alpha) + ((oldLocation[1]/scale) * (1f - alpha))));
 	}
 	
 	public void updateLocation(float alpha) {
