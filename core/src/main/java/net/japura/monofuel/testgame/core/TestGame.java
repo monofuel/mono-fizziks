@@ -10,8 +10,6 @@ import playn.core.ImageLayer;
 import playn.core.Mouse;
 import playn.core.Pointer;
 
-import org.jbox2d.collision.*;
-import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
 
@@ -21,20 +19,18 @@ public class TestGame implements Game {
 	  public static int HEIGHT = 900;
 	  float scale = 2;
 	  
-	  final int[] grid = new int[] {10,10};
-	  float[] pan = new float[] {0,0};
-	  boolean panning = false;
 	  float deltaX = 0;
 	  float deltaY = 0;
-	  MenuBar gameMenu;
-	  boolean loaded = false;
+	  static MenuBar gameMenu;
+	  static boolean loaded = false;
+	  static boolean paused = false;
 	  static int mode;
 	  static boolean horizontal = true;
 	  
-	  World world;
-	  Image grassTile;
+	  static World world;
+	  static Image grassTile;
 	  
-	  ArrayList<Shape> shapeList = new ArrayList<Shape>();
+	  static ArrayList<Shape> shapeList = new ArrayList<Shape>();
 	
   @Override
   public void init() {
@@ -107,11 +103,6 @@ public class TestGame implements Game {
     	
     	public void onPointerDrag(Pointer.Event event) {
     		//compares current location with last location and pans
-    		pan[0] += event.x()-deltaX;
-    		pan[1] += event.y()-deltaY;
-    		
-    		createBox(event.x(),event.y());
-    		
     		
     		//sets new delta for next update
     		deltaX = event.x();
@@ -146,10 +137,16 @@ public class TestGame implements Game {
     //creates object
 	shapeList.add(new Shape(world, "STATIC",new float[] {WIDTH,32}, new float[] {WIDTH/2,HEIGHT-32}));
 	shapeList.get(0).createLayer(graphics().createImageLayer(grassTile),1);
+	shapeList.add(new Shape(world, "STATIC",new float[] {32,HEIGHT}, new float[] {gameMenu.width(),0}));
+	shapeList.get(1).createLayer(graphics().createImageLayer(grassTile),1);
+	shapeList.add(new Shape(world, "STATIC",new float[] {WIDTH,32}, new float[] {WIDTH/2,32}));
+	shapeList.get(2).createLayer(graphics().createImageLayer(grassTile),1);
+	shapeList.add(new Shape(world, "STATIC",new float[] {32,HEIGHT}, new float[] {WIDTH-32,0}));
+	shapeList.get(3).createLayer(graphics().createImageLayer(grassTile),1);
 	
-	
-	//sets the default scale and location of the first square
-	graphics().rootLayer().add(shapeList.get(0).getLayer());
+	for(Shape item : shapeList) {
+	graphics().rootLayer().add(item.getLayer());
+	}
     
     //sets the load bool to true so the paint and update methods know we're ready
     loaded = true;
@@ -169,6 +166,10 @@ public class TestGame implements Game {
   public static void setMode(int modeSet) {
 	  mode = modeSet;
 	  System.out.println(mode);
+  }
+  
+  public static void pause(boolean status) {
+	  paused = status;
   }
   
   public void createBox(float x, float y) {
@@ -203,7 +204,9 @@ public class TestGame implements Game {
 	  if (loaded) { //check if the init has finished
 
 		  //step world physics
-		  world.step(delta/1000, 1,1);
+		  if (!paused) {
+			  world.step(delta/1000, 1,1);
+		  }
 		  
 		//updates every block  
 		  for (Shape item : shapeList) {
@@ -215,7 +218,7 @@ public class TestGame implements Game {
 
   @Override
   public int updateRate() {
-    return 5; //milliseconds to wait each update step
+    return 15; //milliseconds to wait each update step
   }
   
 }

@@ -1,7 +1,6 @@
 package net.japura.monofuel.testgame.core;
 
 import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
@@ -24,7 +23,7 @@ public class Shape {
 	float[] oldLocation;
 	
 	//set scale of pixels to jbox2d grid
-	float scale = 0.02f;
+	float scale = 0.05f;
 	
 	public Shape(World world,String type,float[] size, float[] location) {
 		//System.out.println("creating box at:" + location[0] + "," + location[1]+ "with size of: " + size[0] + "," + size[1]);
@@ -49,9 +48,9 @@ public class Shape {
 	    
 	    fd = new FixtureDef();
 	    fd.shape = shape;
-	    fd.density = .9f;
-	    fd.friction = 0.3f;
-	    fd.restitution = 0.6f;
+	    fd.density = 1f;
+	    fd.friction = 0.6f;
+	    fd.restitution = 0.4f;
 	    body.createFixture(fd);
 	    
 	    //set delta info

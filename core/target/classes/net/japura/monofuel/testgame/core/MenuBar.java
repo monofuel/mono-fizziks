@@ -40,14 +40,28 @@ public class MenuBar {
 		//adds the menu bar to rendering
 		graphics().rootLayer().add(buttonBGLayer);
 		
-		icons.add(new BoxButton("Box", assets().getImage("images/boxButton.png"),assets().getImage("images/boxButtonDown.png")));
-		icons.add(new WeldButton("Weld", assets().getImage("images/weldButton.png"),assets().getImage("images/weldButtonDown.png")));
+		//move box icon
+		
+		icons.add(new MoveButton("Move", assets().getImage("images/clickButton.png"),
+				assets().getImage("images/clickButtonDown.png")));
+		
+		//create box icon
+		icons.add(new BoxButton("Box", assets().getImage("images/boxButton.png"),
+				assets().getImage("images/boxButtonDown.png")));
+		
+		//weld button icon
+		icons.add(new WeldButton("Weld", assets().getImage("images/weldButton.png"),
+				assets().getImage("images/weldButtonDown.png")));
+		
+		//pause button icon
+		icons.add(new PauseButton("Pause", assets().getImage("images/pauseButton.png"),
+				assets().getImage("images/pauseButtonDown.png")));
 		
 		int itin = 1;
 		for (Button item : icons) {
 			item.layer().setDepth(3);
 			item.setOrder(itin);
-			item.layer().setTranslation(10,((TestGame.HEIGHT-item.layer().scaledHeight())/(icons.size()+1))*itin++);
+			item.layer().setTranslation(buttonBGLayer.width()/3,((TestGame.HEIGHT-item.layer().scaledHeight())/(icons.size()+1))*itin++);
 			graphics().rootLayer().add(item.layer());
 		}
 	}
@@ -69,12 +83,12 @@ public class MenuBar {
 		public void onClick() {
 			if (!isDown) {
 				for (Button item : icons) {
-					if (item != this) {
+					if (item != this && !item.getName().equals("Pause") && !this.getName().equals("Pause")) {
 						item.setUp();
 					}
 				}
 				iconDownImage.setDepth(3);
-				iconDownImage.setTranslation(10, ((TestGame.HEIGHT-iconDownImage.scaledHeight())/(icons.size()+1))*order);
+				iconDownImage.setTranslation(buttonBGLayer.width()/3, ((TestGame.HEIGHT-iconDownImage.scaledHeight())/(icons.size()+1))*order);
 				graphics().rootLayer().add(iconDownImage);
 				isDown = true;
 			}
@@ -102,7 +116,7 @@ public class MenuBar {
 				//catch if no buttons are down
 			}
 			iconUpImage.setDepth(3);
-			iconUpImage.setTranslation(10,((TestGame.HEIGHT-iconUpImage.scaledHeight())/(icons.size()+1))*order);
+			iconUpImage.setTranslation(buttonBGLayer.width()/3,((TestGame.HEIGHT-iconUpImage.scaledHeight())/(icons.size()+1))*order);
 			graphics().rootLayer().add(iconUpImage);
 			isDown = false;
 		}
@@ -133,8 +147,41 @@ public class MenuBar {
 		}
 	}
 	
+	public class PauseButton extends Button {
+		boolean paused = false;
+
+		public PauseButton(String name, Image icon, Image iconDown) {
+			super(name, icon, iconDown);
+			
+		}
+		
+		public void onClick() {
+			if (!paused) {
+			super.onClick();
+			paused = true;
+			} else {
+				this.setUp();
+				paused = false;
+			}
+			TestGame.pause(paused);
+		}
+	}
+	
+	public class MoveButton extends Button {
+
+		public MoveButton(String name, Image icon, Image iconDown) {
+			super(name, icon, iconDown);
+			
+		}
+		
+		public void onClick() {
+			super.onClick();
+			TestGame.setMode(2);
+		}
+	}
+	
 	public float width() {
-		return buttonBGLayer.width();
+		return buttonBGLayer.scaledWidth();
 	}
 	
 	public void click(float x, float y) {
