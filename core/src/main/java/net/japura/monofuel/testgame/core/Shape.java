@@ -25,45 +25,59 @@ public class Shape {
 	//set scale of pixels to jbox2d grid
 	float scale = 0.05f;
 	
-	public Shape(World world,String type,float[] size, float[] location) {
-		//System.out.println("creating box at:" + location[0] + "," + location[1]+ "with size of: " + size[0] + "," + size[1]);
-		
+	//creates shape object
+	//TODO: make the shape class modular with sub-classes of specific shapes
+	public Shape(World world, String type,float[] size, float[] location) {
+	
+		//converts the pixel size and location to physics units
 		bodySize = new float[] {size[0]*scale,size[1]*scale};
 		bodyLocation = new float[] {location[0]*scale, location[1]*scale};
 		
+		//set if the body is static or dynamic
 		shapeBodyDef = new BodyDef();
 		if (type.equals("STATIC")){
 			shapeBodyDef.type = BodyType.STATIC;
 		} else if (type.equals("DYNAMIC")) {
 			shapeBodyDef.type = BodyType.DYNAMIC;
 		}
+		
+		//places the shape definition on the world
 	    shapeBodyDef.position.x = bodyLocation[0];
 	    shapeBodyDef.position.y = bodyLocation[1];
 	    
+	    //creates a physics body from the shape definition
 	    body = world.createBody(shapeBodyDef);
+	    //create a new basic shape
 	    shape = new PolygonShape();
 	    
-	    //shape.setAsBox(bodySize[0],bodySize[1], new Vec2(bodySize[0]/2,bodySize[1]/2), 0);
+	    //set the shape as a box of the size of our desired box in physics units
 	    shape.setAsBox(bodySize[0],bodySize[1]);
 	    
+	    //define physical features of the object
 	    fd = new FixtureDef();
 	    fd.shape = shape;
 	    fd.density = 1f;
-	    fd.friction = 0.6f;
+	    fd.friction = 0.9f;
 	    fd.restitution = 0.4f;
 	    body.createFixture(fd);
 	    
-	    //set delta info
+	    //set delta info for calculations
 		oldAngle = body.getAngle();
 		oldLocation = new float[] {body.getPosition().x,body.getPosition().y};
 	}
 	
+	//attach the ImageLayer graphic to the object
 	public void createLayer(ImageLayer createImage,int depth) {
 		image = createImage;
 		image.setDepth(depth);
-		//image.setScale(scale);
+		
+		//increase the scale so the box graphic matches the physical dimensions of the box
 		image.setScale((bodySize[0]/scale*2)/image.width(),(bodySize[1]/scale*2)/image.height());
+		
+		//moves the box to it's location
 		image.setTranslation(body.getPosition().x/scale, body.getPosition().y/scale);
+		
+		//sets the origin for the object to rotate around
 		image.setOrigin(image.height()/2,image.width()/2);
 		
 	}
@@ -73,7 +87,7 @@ public class Shape {
 	}
 	public void paint(float alpha) {
 
-		 // interpolate based on previous state
+		 //move the object based on how many frames have passed and how much the object has moved
 	    float x = ((body.getPosition().x/scale) * alpha) + ((oldLocation[0]/scale) * (1f - alpha));
 	    float y = ((body.getPosition().y/scale) * alpha) + ((oldLocation[1]/scale) * (1f - alpha));
 	    float a = (body.getAngle() * alpha) + (oldAngle * (1f - alpha));
@@ -82,6 +96,7 @@ public class Shape {
 		
 	}
 	
+	//updates the deltas to be used in graphical calculations
 	public void updateLocation(float alpha) {
 		oldLocation[0] = body.getPosition().x;
 	    oldLocation[1] = body.getPosition().y;
