@@ -10,9 +10,11 @@ import playn.core.Layer;
 
 public class MenuBar {
 	
+	//list of buttons
 	ArrayList<Button> icons = new ArrayList<Button>();
+	
+	//menu bar background
 	Image buttonBG;
-	ImageLayer iconsLayer;
 	ImageLayer buttonBGLayer;
 	
 	public MenuBar(boolean horizontal) {
@@ -26,6 +28,7 @@ public class MenuBar {
 		if (horizontal) {
 			
 			//resizes the menu bar to fit the screen height
+			//TODO: make portrait mode work
 			if (TestGame.HEIGHT != buttonBGLayer.height()) {
 				buttonBGLayer.setScale(TestGame.HEIGHT/buttonBGLayer.height());
 			}	
@@ -40,8 +43,7 @@ public class MenuBar {
 		//adds the menu bar to rendering
 		graphics().rootLayer().add(buttonBGLayer);
 		
-		//move box icon
-		
+		//creates move shape icon
 		icons.add(new MoveButton("Move", assets().getImage("images/clickButton.png"),
 				assets().getImage("images/clickButtonDown.png")));
 		
@@ -57,6 +59,7 @@ public class MenuBar {
 		icons.add(new PauseButton("Pause", assets().getImage("images/pauseButton.png"),
 				assets().getImage("images/pauseButtonDown.png")));
 		
+		//itinerate over reach object and set their positions on the menu
 		int itin = 1;
 		for (Button item : icons) {
 			item.layer().setDepth(3);
@@ -67,11 +70,11 @@ public class MenuBar {
 	}
 	
 	
-	
+	//Button object parent class
 	public class Button {
 		ImageLayer iconDownImage,iconUpImage;
 		String name;
-		int order;
+		int order; //order on the menu to appear
 		boolean isDown = false;
 		
 		public Button(String thisName, Image icon, Image iconDown) {

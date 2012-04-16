@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 import playn.core.Game;
 import playn.core.Image;
-import playn.core.ImageLayer;
 import playn.core.Mouse;
 import playn.core.Pointer;
 
@@ -25,60 +24,32 @@ public class TestGame implements Game {
 	  static boolean loaded = false;
 	  static boolean paused = false;
 	  static int mode;
+	  static Shape selectedBox;
+	  static boolean moving;
 	  static boolean horizontal = true;
 	  
-	  static World world;
-	  static Image grassTile;
-	  
 	  static ArrayList<Shape> shapeList = new ArrayList<Shape>();
+	  
+	  public static AssetManager manager = new AssetManager();
+	  public static SpaceWorld gameWorld = new SpaceWorld();
 	
   @Override
   public void init() {
 	  
 	graphics().setSize(WIDTH, HEIGHT);
-	  
-	// create and add background image layer
-	Image bgImage = assets().getImage("images/bg.png");
-	ImageLayer bgLayer = graphics().createImageLayer(bgImage);
-	bgLayer.setScale(HEIGHT/bgLayer.height(), WIDTH/bgLayer.width());
-	bgLayer.setDepth(0);
-	graphics().rootLayer().add(bgLayer);
+	
+	//creates the background layers and set it's size
+	int bg = manager.newAsset("bg",0); 
+	manager.getAsset(bg).setScale(HEIGHT, WIDTH);
 	
 	//creates a menu
 	final MenuBar gameMenu = new MenuBar(horizontal);
-	  
-    
-    //loads grass.png
-    grassTile = assets().getImage("images/grass.png");
 
-    /*
-    //grid[] is the x and y sizes of the array
-    for (int x = 0; x < grid[0]; x++){
-    	fgLayer.add(new ArrayList<ImageLayer>());
-    	for (int y = 0; y < grid[1]; y++){
-    		
-    		//adds a grass tile to each ImageLayer in the array
-    		fgLayer.get(x).add(graphics().createImageLayer(grassTile));
-    		fgLayer.get(x).get(y).setDepth(1);
-    		
-    		//sets the default scale and location of each tile
-    		fgLayer.get(x).get(y).setTranslation((16*scale*x)+pan[0],(16*scale*y)+pan[1]);
-    		fgLayer.get(x).get(y).setScale(scale);
-    	}
-    }*/
-    
-    
-    
-    //iterate through every x and y block
-    /*
-    for (int x = 0; x < grid[0]; x++){
-    	for (int y = 0; y < grid[1]; y++){
-    		//add every item in the fgLayer arraylist to the graphics().rootlayer() for rendering
-    		graphics().rootLayer().add(fgLayer.get(x).get(y));
-    	}
-    }*/
-    
-    
+	
+	//
+	// input handling
+	//
+	
     //create a mouse listener to handle the mousewheel
     mouse().setListener(new Mouse.Adapter() {
 
@@ -99,6 +70,7 @@ public class TestGame implements Game {
     		//set new start location
     		deltaX = event.x();
     		deltaY = event.y();
+    		mouseDown(event.x(), event.y());
     	}
     	
     	public void onPointerDrag(Pointer.Event event) {
@@ -107,52 +79,47 @@ public class TestGame implements Game {
     		//sets new delta for next update
     		deltaX = event.x();
     		deltaY = event.y();
+    		if (moving && selectedBox != null) {
+    			moveBox(event.x(),event.y());
+    		}
+    		
     	}
     	
     	public void onPointerEnd(Pointer.Event event) {
     		do {
     		if (horizontal) {
     			if (event.x() > gameMenu.width()){
-    				click(event.x(),event.y());
+    				mouseUp(event.x(),event.y());
     				break;
     			}
     		} else {
     			if (event.y() > gameMenu.width()){
-    				click(event.x(),event.y());
+    				mouseUp(event.x(),event.y());
     				break;
     			}
+    		}
+    		if (moving) {
+    			moveBoxStop();
     		}
     		gameMenu.click(event.x(), event.y());
     		} while (false);
     	}
     });
-
-    //physics code
-    Vec2 gravity = new Vec2( 0.0f, 50.0f);
-    
-    boolean doSleep = true;
-    
-    world = new World(gravity, doSleep);
-
-    //creates object
-	shapeList.add(new Shape(world, "STATIC",new float[] {WIDTH,32}, new float[] {WIDTH/2,HEIGHT-32}));
-	shapeList.get(0).createLayer(graphics().createImageLayer(grassTile),1);
-	shapeList.add(new Shape(world, "STATIC",new float[] {32,HEIGHT}, new float[] {gameMenu.width(),0}));
-	shapeList.get(1).createLayer(graphics().createImageLayer(grassTile),1);
-	shapeList.add(new Shape(world, "STATIC",new float[] {WIDTH,32}, new float[] {WIDTH/2,32}));
-	shapeList.get(2).createLayer(graphics().createImageLayer(grassTile),1);
-	shapeList.add(new Shape(world, "STATIC",new float[] {32,HEIGHT}, new float[] {WIDTH-32,0}));
-	shapeList.get(3).createLayer(graphics().createImageLayer(grassTile),1);
-	
-	for(Shape item : shapeList) {
-	graphics().rootLayer().add(item.getLayer());
-	}
     
     //sets the load bool to true so the paint and update methods know we're ready
     loaded = true;
   }
   
-  public void click(float x, float y) {
+  public static AssetManager getManager() {
+	  return manager;
+  }
+  
+  public static World getWorld() {
+	  return gameWorld.getWorld();
+  }
+  
+  
+  public void mouseUp(float x, float y) {
 	  switch (mode) {
 	  case 0:
 		  createBox(x,y);
@@ -160,27 +127,67 @@ public class TestGame implements Game {
 	  case 1:
 		  
 		  break;
+	  case 2:
+		  break;
+	  }
+  }
+  
+  public void mouseDown(float x, float y) {
+	  switch (mode) {
+	  case 0:
+		  break;
+	  case 1:
+		  break;
+	  case 2:
+		  moveBoxStart(x,y);
+		  break;
 	  }
   }
   
   public static void setMode(int modeSet) {
 	  mode = modeSet;
-	  System.out.println(mode);
+	  System.out.println("setting mode to :" + mode);
   }
   
   public static void pause(boolean status) {
 	  paused = status;
   }
   
+  public static void moveBox(float x, float y) {
+	  selectedBox.applyForce(x, y);
+  }
+  
+  public static void moveBoxStart(float x, float y) {
+	  moving = true;
+	  Shape foundBox = findBox(x,y);
+	  if (foundBox != null) {
+		  selectedBox = foundBox;
+	  }
+  }
+  
+  public static void moveBoxStop() {
+	  moving = false;
+	  selectedBox = null;
+  }
+  
+  public static Shape findBox(float x, float y) {
+	  for (Shape item : shapeList) {
+		  if (item.checkCollision(x, y)) {
+			  return item;
+		  }
+	  }
+	  return null;
+  }
+  
   public void createBox(float x, float y) {
 	  
-	  int index = shapeList.size();
+	  //int index = shapeList.size();
 	  
-	  shapeList.add(new Shape(world, "DYNAMIC",new float[] {32,32},new float[] {x+16,y+16}));
-	  shapeList.get(index).createLayer(graphics().createImageLayer(grassTile),1);
+	  shapeList.add(new Shape("DYNAMIC",new float[] {32,32},new float[] {x+16,y+16},"grass",1));
+	  //shapeList.get(index).createLayer("grass",1);
 		
 	  //sets the default scale and location of each tile
-	  graphics().rootLayer().add(shapeList.get(index).getLayer());
+	  //graphics().rootLayer().add(shapeList.get(index).getLayer());
   }
   
   //public void weldBox(Shape[] boxlist) {}
@@ -205,7 +212,7 @@ public class TestGame implements Game {
 
 		  //step world physics
 		  if (!paused) {
-			  world.step(delta/1000, 1,1);
+			  gameWorld.getWorld().step(delta/1000, 1,1);
 		  }
 		  
 		//updates every block  
@@ -218,7 +225,7 @@ public class TestGame implements Game {
 
   @Override
   public int updateRate() {
-    return 15; //milliseconds to wait each update step
+    return 25; //milliseconds to wait each update step
   }
   
 }
