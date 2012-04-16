@@ -9,6 +9,8 @@ import playn.core.Image;
 import playn.core.Mouse;
 import playn.core.Pointer;
 
+import net.japura.monofuel.testgame.core.AssetManager.GameAsset;
+
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
 
@@ -17,6 +19,8 @@ public class TestGame implements Game {
 	  public static int WIDTH = 1440;
 	  public static int HEIGHT = 900;
 	  float scale = 2;
+	  static float[] cameraLocation = new float[] {0,0};
+	  static int currentCamera = 0;
 	  
 	  float deltaX = 0;
 	  float deltaY = 0;
@@ -28,10 +32,12 @@ public class TestGame implements Game {
 	  static boolean moving;
 	  static boolean horizontal = true;
 	  
+	  static World world;
+
 	  static ArrayList<Shape> shapeList = new ArrayList<Shape>();
+	  static ArrayList<Shape> cpuList = new ArrayList<Shape>();
 	  
 	  public static AssetManager manager = new AssetManager();
-	  public static SpaceWorld gameWorld = new SpaceWorld();
 	
   @Override
   public void init() {
@@ -106,6 +112,21 @@ public class TestGame implements Game {
     	}
     });
     
+    
+    //
+    //physics world
+    //
+    
+    
+    Vec2 gravity = new Vec2( 0.0f, 0.0f);
+    
+    boolean doSleep = true;
+    
+    world = new World(gravity, doSleep);
+    
+    shapeList.add(new Shape("DYNAMIC",new float[] {32,32},new float[] {WIDTH/2,HEIGHT/2},"cpu",1));
+    cpuList.add(shapeList.get(shapeList.size()-1));
+    
     //sets the load bool to true so the paint and update methods know we're ready
     loaded = true;
   }
@@ -115,7 +136,7 @@ public class TestGame implements Game {
   }
   
   public static World getWorld() {
-	  return gameWorld.getWorld();
+	  return world;
   }
   
   
@@ -146,7 +167,7 @@ public class TestGame implements Game {
   
   public static void setMode(int modeSet) {
 	  mode = modeSet;
-	  System.out.println("setting mode to :" + mode);
+	  System.out.println("setting mode to: " + mode);
   }
   
   public static void pause(boolean status) {
@@ -191,9 +212,18 @@ public class TestGame implements Game {
   }
   
   //public void weldBox(Shape[] boxlist) {}
-
-  float testItin = 0;
   
+  public static void setCamera(float[] position) {
+	  
+	  //sets camera location with slight lag behind the ship
+	  cameraLocation[0] += (position[0]-cameraLocation[0])/5;
+	  cameraLocation[1] += (position[1]-cameraLocation[1])/5;
+  }
+  
+  public static float[] getCamera() {
+	  return cameraLocation;
+  }
+
   @Override
   public void paint(float alpha) {
 	  if (loaded) { //check if the init has finished
@@ -212,13 +242,18 @@ public class TestGame implements Game {
 
 		  //step world physics
 		  if (!paused) {
-			  gameWorld.getWorld().step(delta/1000, 1,1);
+			  world.step(delta/1000, 1,1);
 		  }
 		  
-		//updates every block  
+		  
+		  //updates every block  
 		  for (Shape item : shapeList) {
 			  item.updateLocation(delta);
 		  }
+		  
+		  //updates camera location
+		  setCamera(cpuList.get(currentCamera).getLocation());
+		  
 		  
 	  }
   }

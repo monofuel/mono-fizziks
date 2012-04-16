@@ -22,6 +22,7 @@ public class Shape {
 	float[] bodyLocation;
 	float oldAngle;
 	float[] oldLocation;
+	float[] cameraLocation = TestGame.getCamera();
 	World thisWorld;
 	AssetManager manager;
 	GameAsset asset;
@@ -29,7 +30,7 @@ public class Shape {
 	int assetIndex = -1;
 	
 	//set scale of pixels to jbox2d grid
-	float scale = 0.05f;
+	static float scale = 0.05f;
 	
 	//creates shape object
 	//TODO: make the shape class modular with sub-classes of specific shapes
@@ -38,6 +39,10 @@ public class Shape {
 		
 		thisWorld = TestGame.getWorld();
 		manager = TestGame.getManager();
+
+		//convert x and y from screen coords to their proper world coords with camera offset
+		location = new float[] {location[0] - (TestGame.WIDTH/2-(cameraLocation[0]/scale)),
+				 				location[1] - (TestGame.HEIGHT/2-(cameraLocation[1]/scale))};
 		
 		//converts the pixel size and location to physics units
 		bodySize = new float[] {size[0]*scale,size[1]*scale};
@@ -91,11 +96,12 @@ public class Shape {
 	
 	public void paint(float alpha) {
 
-		 //move the object based on how many frames have passed and how much the object has moved
+		//move the object based on how many frames have passed and how much the object has moved
 	    float x = ((body.getPosition().x/scale) * alpha) + ((oldLocation[0]/scale) * (1f - alpha));
 	    float y = ((body.getPosition().y/scale) * alpha) + ((oldLocation[1]/scale) * (1f - alpha));
 	    float a = (body.getAngle() * alpha) + (oldAngle * (1f - alpha));
-	    asset.setTranslation(x, y);
+	    asset.setTranslation(x + (TestGame.WIDTH/2-(cameraLocation[0]/scale)),
+	    					 y + (TestGame.HEIGHT/2-(cameraLocation[1]/scale)));
 	    asset.setRotation(a);
 		
 	}
@@ -105,17 +111,29 @@ public class Shape {
 		oldLocation[0] = body.getPosition().x;
 	    oldLocation[1] = body.getPosition().y;
 		oldAngle = body.getAngle();
-		
+	}
+	
+	//returns the location of the object
+	public float[] getLocation() {
+		return new float[] {body.getPosition().x,body.getPosition().y};
 	}
 	
 	//checks if the tested point is inside this object
 	public boolean checkCollision(float x, float y) {
-		return shape.testPoint(body.getTransform(), new Vec2(x*scale,y*scale));
+		return shape.testPoint(body.getTransform(),
+				               new Vec2((x - (TestGame.WIDTH/2-(cameraLocation[0]/scale)))*scale,
+				            		    (y - (TestGame.HEIGHT/2-(cameraLocation[1]/scale)))*scale));
 	}
 	
 	//applies a force to this object of this vector from this object
 	public void applyForce(float x, float y) {
-		body.applyForce(new Vec2(((x*scale)-body.getPosition().x)*100,((y*scale)-body.getPosition().y)*100), body.getWorldCenter());
+		body.applyForce(new Vec2((((x - (TestGame.WIDTH/2-(cameraLocation[0]/scale)))*scale)-body.getPosition().x)*100,
+				                 (((y - (TestGame.HEIGHT/2-(cameraLocation[1]/scale)))*scale)-body.getPosition().y)*100),
+				                 body.getWorldCenter());
+	}
+	
+	public GameAsset getAsset() {
+		return asset;
 	}
 	
 	/*
@@ -128,6 +146,10 @@ public class Shape {
 	
 	public Body getBody() {
 		return body;
+	}
+	
+	public static float getScale() {
+		return scale;
 	}
 
 }
