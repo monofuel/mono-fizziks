@@ -27,6 +27,7 @@ public class Shape {
 	AssetManager manager;
 	GameAsset asset;
 	
+	ShapeBody parentBody = null;
 	int assetIndex = -1;
 	
 	//set scale of pixels to jbox2d grid
@@ -74,7 +75,10 @@ public class Shape {
 	    fd.density = 1f;
 	    fd.friction = 0.9f;
 	    fd.restitution = 0.3f;
+	    fd.userData = this;
 	    body.createFixture(fd);
+	    
+	    
 	    
 	    //set delta info for calculations
 		oldAngle = body.getAngle();
@@ -132,6 +136,7 @@ public class Shape {
 				                 body.getWorldCenter());
 	}
 	
+	
 	public GameAsset getAsset() {
 		return asset;
 	}
@@ -144,6 +149,14 @@ public class Shape {
 		//jointList.add(new WeldJoint(thisWorld.getPool(),weldJoint);
 	}*/
 	
+	//
+	//joint methods
+	//
+	
+	public Vec2 getCenter() {
+		return body.getWorldCenter();
+	}
+	
 	public Body getBody() {
 		return body;
 	}
@@ -151,5 +164,16 @@ public class Shape {
 	public static float getScale() {
 		return scale;
 	}
+	
+	public void setJoin(ShapeBody parent) {
+		parentBody = parent;
+	}
+	
+	public void delJoin() {
+		parentBody = null;
+	}
 
+	public ShapeBody getParent() {
+		return parentBody;
+	}
 }

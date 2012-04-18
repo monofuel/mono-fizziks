@@ -11,8 +11,12 @@ import playn.core.Pointer;
 
 import net.japura.monofuel.testgame.core.AssetManager.GameAsset;
 
+import org.jbox2d.callbacks.ContactImpulse;
+import org.jbox2d.callbacks.ContactListener;
+import org.jbox2d.collision.Manifold;
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
+import org.jbox2d.dynamics.contacts.Contact;
 
 public class TestGame implements Game {
 	
@@ -29,6 +33,7 @@ public class TestGame implements Game {
 	  static boolean paused = false;
 	  static int mode;
 	  static Shape selectedBox;
+	  static Shape contactingBox;
 	  static boolean moving;
 	  static boolean horizontal = true;
 	  
@@ -36,9 +41,10 @@ public class TestGame implements Game {
 
 	  static ArrayList<Shape> shapeList = new ArrayList<Shape>();
 	  static ArrayList<Shape> cpuList = new ArrayList<Shape>();
+	  static ArrayList<Contact> contactArray = new ArrayList<Contact>();
 	  
 	  public static AssetManager manager = new AssetManager();
-	
+	  
   @Override
   public void init() {
 	  
@@ -117,6 +123,46 @@ public class TestGame implements Game {
     //physics world
     //
     
+    class ContList implements ContactListener {
+
+		@Override
+		public void beginContact(Contact contact) {
+			// TODO Auto-generated method stub
+			boolean contacting = false;
+			for (Contact item : contactArray) {
+				if (item.equals(contact)) {
+					contacting = true;
+				}
+			}
+			if (!contacting) {
+				contactArray.add(contact);
+			}
+			
+		}
+
+		@Override
+		public void endContact(Contact contact) {
+			try {
+					contactArray.remove(contact);
+			} catch (Exception e) {
+				//HA! you really expected me to catch my errors?
+			}
+			
+		}
+
+		@Override
+		public void preSolve(Contact contact, Manifold oldManifold) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void postSolve(Contact contact, ContactImpulse impulse) {
+			// TODO Auto-generated method stub
+			
+		}
+    	
+    }
     
     Vec2 gravity = new Vec2( 0.0f, 0.0f);
     
@@ -124,11 +170,15 @@ public class TestGame implements Game {
     
     world = new World(gravity, doSleep);
     
+    world.setContactListener(new ContList());
+    
     shapeList.add(new Shape("DYNAMIC",new float[] {32,32},new float[] {WIDTH/2,HEIGHT/2},"cpu",1));
     cpuList.add(shapeList.get(shapeList.size()-1));
     
     //sets the load bool to true so the paint and update methods know we're ready
     loaded = true;
+    
+    
   }
   
   public static AssetManager getManager() {
@@ -146,11 +196,15 @@ public class TestGame implements Game {
 		  createBox(x,y);
 		  break;
 	  case 1:
-		  
+		  selectBox(x,y);
 		  break;
 	  case 2:
 		  break;
+	  case 3:
+		  weldBox(x,y);
+		  break;
 	  }
+		  
   }
   
   public void mouseDown(float x, float y) {
@@ -161,6 +215,8 @@ public class TestGame implements Game {
 		  break;
 	  case 2:
 		  moveBoxStart(x,y);
+		  break;
+	  case 3:
 		  break;
 	  }
   }
@@ -176,6 +232,13 @@ public class TestGame implements Game {
   
   public static void moveBox(float x, float y) {
 	  selectedBox.applyForce(x, y);
+	  for (Contact item : contactArray) {
+		  if (((Shape)item.m_fixtureA.m_userData).equals(selectedBox)) {
+			  contactingBox = ((Shape)item.m_fixtureB.m_userData);
+		  } else if (((Shape)item.m_fixtureB.m_userData).equals(selectedBox)) {
+			  contactingBox = ((Shape)item.m_fixtureA.m_userData);
+		  }
+	  }
   }
   
   public static void moveBoxStart(float x, float y) {
@@ -188,7 +251,11 @@ public class TestGame implements Game {
   
   public static void moveBoxStop() {
 	  moving = false;
+	  if (contactingBox != null) {
+		  new ShapeBody(selectedBox, contactingBox);
+	  }
 	  selectedBox = null;
+	  contactingBox = null;
   }
   
   public static Shape findBox(float x, float y) {
@@ -211,13 +278,26 @@ public class TestGame implements Game {
 	  //graphics().rootLayer().add(shapeList.get(index).getLayer());
   }
   
-  //public void weldBox(Shape[] boxlist) {}
+  public void selectBox(float x, float y) {
+	  selectedBox = findBox(x,y);
+	  if (selectedBox != null) {
+	  setMode(3);
+	  }
+  }
+  
+  public void weldBox(float x, float y) {
+	  Shape secondBox = findBox(x,y);
+	  if (secondBox != null) {
+		  new ShapeBody(selectedBox, secondBox);
+		  setMode(1);
+	  }
+  }
   
   public static void setCamera(float[] position) {
 	  
 	  //sets camera location with slight lag behind the ship
-	  cameraLocation[0] += (position[0]-cameraLocation[0])/5;
-	  cameraLocation[1] += (position[1]-cameraLocation[1])/5;
+	  cameraLocation[0] += (position[0]-cameraLocation[0])/8;
+	  cameraLocation[1] += (position[1]-cameraLocation[1])/8;
   }
   
   public static float[] getCamera() {
@@ -251,6 +331,8 @@ public class TestGame implements Game {
 			  item.updateLocation(delta);
 		  }
 		  
+		  ShapeBody.updateShapes(delta);
+		  
 		  //updates camera location
 		  setCamera(cpuList.get(currentCamera).getLocation());
 		  
@@ -260,7 +342,7 @@ public class TestGame implements Game {
 
   @Override
   public int updateRate() {
-    return 25; //milliseconds to wait each update step
+    return 10; //milliseconds to wait each update step
   }
   
 }
