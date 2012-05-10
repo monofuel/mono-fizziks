@@ -3,9 +3,9 @@ package net.japura.monofuel.testgame.core;
 import static playn.core.PlayN.*;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import playn.core.Game;
-import playn.core.Image;
 import playn.core.Mouse;
 import playn.core.Pointer;
 
@@ -32,14 +32,14 @@ public class TestGame implements Game {
 	  static boolean loaded = false;
 	  static boolean paused = false;
 	  static int mode;
-	  static Shape selectedBox;
-	  static Shape contactingBox;
+	  static ShapeBody selectedBox;
+	  static ShapeBody contactingBox;
 	  static boolean moving;
 	  static boolean horizontal = true;
 	  
 	  static World world;
 
-	  static ArrayList<Shape> shapeList = new ArrayList<Shape>();
+	  static ArrayList<ShapeBody> shapeList = new ArrayList<ShapeBody>();
 	  static ArrayList<Shape> cpuList = new ArrayList<Shape>();
 	  static ArrayList<Contact> contactArray = new ArrayList<Contact>();
 	  
@@ -172,8 +172,29 @@ public class TestGame implements Game {
     
     world.setContactListener(new ContList());
     
-    shapeList.add(new Shape("DYNAMIC",new float[] {32,32},new float[] {WIDTH/2,HEIGHT/2},"cpu",1));
-    cpuList.add(shapeList.get(shapeList.size()-1));
+    //shapeList.add(new Shape("DYNAMIC",new float[] {32,32},new float[] {WIDTH/2,HEIGHT/2},"cpu",1));
+    //cpuList.add(shapeList.get(shapeList.size()-1));
+    
+    String[][] shipBody = new String[][]
+    		{{" ","H"," "},
+    		 {"H","C","H"},
+    		 {" ","H"," "}};
+    String[][] asteroid = new String[][]
+    		{{" ","H"," "},
+    		 {"H","H","H"},
+    		 {"H","H","H"},
+    		 {" ","H"," "}};
+    
+    
+    ShapeBody ship = new ShapeBody(shipBody,"DYNAMIC",new float[] {0,0},1);
+    shapeList.add(ship);
+    
+    for (int i = 0; i < 10; i++) {
+    	Random randint = new Random();
+    	randint.nextInt(100);
+    	shapeList.add(new ShapeBody(asteroid,"DYNAMIC",new float[] {1*(randint.nextInt(100)-50),
+    																1*(randint.nextInt(100)-50)},1));
+    }
     
     //sets the load bool to true so the paint and update methods know we're ready
     loaded = true;
@@ -234,16 +255,16 @@ public class TestGame implements Game {
 	  selectedBox.applyForce(x, y);
 	  for (Contact item : contactArray) {
 		  if (((Shape)item.m_fixtureA.m_userData).equals(selectedBox)) {
-			  contactingBox = ((Shape)item.m_fixtureB.m_userData);
+			  //contactingBox = ((Shape)item.m_fixtureB.m_userData);
 		  } else if (((Shape)item.m_fixtureB.m_userData).equals(selectedBox)) {
-			  contactingBox = ((Shape)item.m_fixtureA.m_userData);
+			  //contactingBox = ((Shape)item.m_fixtureA.m_userData);
 		  }
 	  }
   }
   
   public static void moveBoxStart(float x, float y) {
 	  moving = true;
-	  Shape foundBox = findBox(x,y);
+	  ShapeBody foundBox = findBox(x,y);
 	  if (foundBox != null) {
 		  selectedBox = foundBox;
 	  }
@@ -252,14 +273,14 @@ public class TestGame implements Game {
   public static void moveBoxStop() {
 	  moving = false;
 	  if (contactingBox != null) {
-		  new ShapeBody(selectedBox, contactingBox);
+		  //new ShapeBody(selectedBox, contactingBox);
 	  }
 	  selectedBox = null;
 	  contactingBox = null;
   }
   
-  public static Shape findBox(float x, float y) {
-	  for (Shape item : shapeList) {
+  public static ShapeBody findBox(float x, float y) {
+	  for (ShapeBody item : shapeList) {
 		  if (item.checkCollision(x, y)) {
 			  return item;
 		  }
@@ -271,7 +292,20 @@ public class TestGame implements Game {
 	  
 	  //int index = shapeList.size();
 	  
-	  shapeList.add(new Shape("DYNAMIC",new float[] {32,32},new float[] {x+16,y+16},"grass",1));
+	  String[][] newBlock = new String[][]
+	    		{{" ","H"," "},
+	    		 {"H","H","H"},
+	    		 {" ","H"," "}};
+	    
+	    ShapeBody roid = new ShapeBody(newBlock,"DYNAMIC",new float[] {(x-(WIDTH/2))*Shape.getScale(),
+	    															   (y-(HEIGHT/2))*Shape.getScale()} ,1);
+	    shapeList.add(roid);
+	    
+	    
+	  
+	  //shapeList.add(new Shape("DYNAMIC",new float[] {32,32},new float[] {x+16,y+16},"grass",1).getParent());
+	  //shapeList.add(new ShapeBody(new String[][] {{"H"}},"DYNAMIC",new float[] {WIDTH/2+200,HEIGHT/2+200},1));
+	  //shapeList.add(new ShapeBody("DYNAMIC",new float[] {x+16,y+16}));
 	  //shapeList.get(index).createLayer("grass",1);
 		
 	  //sets the default scale and location of each tile
@@ -286,9 +320,9 @@ public class TestGame implements Game {
   }
   
   public void weldBox(float x, float y) {
-	  Shape secondBox = findBox(x,y);
+	  ShapeBody secondBox = findBox(x,y);
 	  if (secondBox != null) {
-		  new ShapeBody(selectedBox, secondBox);
+		  //new ShapeBody(selectedBox, secondBox);
 		  setMode(1);
 	  }
   }
@@ -303,13 +337,17 @@ public class TestGame implements Game {
   public static float[] getCamera() {
 	  return cameraLocation;
   }
+  
+  public static void addCPU(Shape cpuShape) {
+	  cpuList.add(cpuShape);
+  }
 
   @Override
   public void paint(float alpha) {
 	  if (loaded) { //check if the init has finished
 
 		  //paints every block  
-		  for (Shape item : shapeList) {
+		  for (ShapeBody item : shapeList) {
 			  item.paint(alpha);
 		  }
 		  
@@ -327,11 +365,9 @@ public class TestGame implements Game {
 		  
 		  
 		  //updates every block  
-		  for (Shape item : shapeList) {
+		  for (ShapeBody item : shapeList) {
 			  item.updateLocation(delta);
 		  }
-		  
-		  ShapeBody.updateShapes(delta);
 		  
 		  //updates camera location
 		  setCamera(cpuList.get(currentCamera).getLocation());

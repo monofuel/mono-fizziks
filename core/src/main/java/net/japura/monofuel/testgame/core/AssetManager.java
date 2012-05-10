@@ -24,6 +24,8 @@ public class AssetManager {
 	//creates a new asset
 	public int newAsset(String imageName, int depth) {
 		
+		
+		
 		lastKey++;//increases the current key index
 		
 		if (!imageMap.containsKey(imageName)) { //checks if the image requested is already loaded
@@ -66,7 +68,6 @@ public class AssetManager {
 		
 		//sets the scale of the object
 		public void setScale(float height, float width) {
-			
 			//divides the desired size by the current to get the difference ratio for the scaling
 			assetLayer.setScale(height/assetLayer.height(),
 								width/assetLayer.width());
@@ -83,7 +84,12 @@ public class AssetManager {
 		}
 		
 		//sets the origin of the object to it's middle
-		public void setOrigin() {
+		public void setOrigin(float[] location) {
+			assetLayer.setOrigin(location[0],location[1]);
+		}
+		
+		//sets the origin of the object to it's middle
+		public void defaultOrigin() {
 			assetLayer.setOrigin(assetLayer.width()/2, assetLayer.height()/2);
 		}
 		
