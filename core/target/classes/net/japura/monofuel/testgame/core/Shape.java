@@ -188,6 +188,6 @@ public Shape(ShapeBody parent,float[] size, float[] location,int[] newoffset, St
 	}
 	
 	public float[] getLocation() {
-		return new float[] {body.getPosition().x,body.getPosition().y};
+		return new float[] {body.getWorldCenter().x,body.getWorldCenter().y};
 	}
 }

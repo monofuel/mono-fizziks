@@ -98,11 +98,21 @@ public class ShapeBody {
 				
 				//System.out.println(thisLocation[0] + " : " + thisLocation[1]);
 				if (arrayBody[i][k].equals("H")) {
-					shapeList.add(new Shape(this,new float[] {32,32}, location,new int[] {i,k},"grass",depth));
+					shapeList.add(new Shape(this,new float[] {32,32}, location,new int[] {i,k},"hull",depth));
 					//System.out.println("adding hull section");
 				}
 				if (arrayBody[i][k].equals("C")) {
 					shapeList.add(new Shape(this,new float[] {32,32}, location,new int[] {i,k},"cpu",depth));
+					TestGame.addCPU(shapeList.get(shapeList.size()-1));
+					//System.out.println("adding cpu section");
+				}
+				if (arrayBody[i][k].equals("A")) {
+					shapeList.add(new Shape(this,new float[] {32,32}, location,new int[] {i,k},"asteroid",depth));
+					TestGame.addCPU(shapeList.get(shapeList.size()-1));
+					//System.out.println("adding cpu section");
+				}
+				if (arrayBody[i][k].equals("E")) {
+					shapeList.add(new Shape(this,new float[] {32,32}, location,new int[] {i,k},"cargo",depth));
 					TestGame.addCPU(shapeList.get(shapeList.size()-1));
 					//System.out.println("adding cpu section");
 				}

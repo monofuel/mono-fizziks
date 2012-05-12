@@ -176,14 +176,14 @@ public class TestGame implements Game {
     //cpuList.add(shapeList.get(shapeList.size()-1));
     
     String[][] shipBody = new String[][]
-    		{{" ","H"," "},
-    		 {"H","C","H"},
-    		 {" ","H"," "}};
+    		{{" ","H","H", " "},
+    		 {"H","C","E", "H"},
+    		 {" ","H","H", " "}};
     String[][] asteroid = new String[][]
-    		{{" ","H"," "},
-    		 {"H","H","H"},
-    		 {"H","H","H"},
-    		 {" ","H"," "}};
+    		{{" ","A"," "},
+    		 {"A","A","A"},
+    		 {"A","A","A"},
+    		 {" ","A"," "}};
     
     
     ShapeBody ship = new ShapeBody(shipBody,"DYNAMIC",new float[] {0,0},1);
@@ -293,12 +293,12 @@ public class TestGame implements Game {
 	  //int index = shapeList.size();
 	  
 	  String[][] newBlock = new String[][]
-	    		{{" ","H"," "},
-	    		 {"H","H","H"},
-	    		 {" ","H"," "}};
-	    
-	    ShapeBody roid = new ShapeBody(newBlock,"DYNAMIC",new float[] {(x-(WIDTH/2))*Shape.getScale(),
-	    															   (y-(HEIGHT/2))*Shape.getScale()} ,1);
+	    		{{" ","A"," "},
+	    		 {"A","A","A"},
+	    		 {" ","A"," "}};
+	  System.out.println("camera at "+ cameraLocation[0] + ":" + cameraLocation[1]);
+	    ShapeBody roid = new ShapeBody(newBlock,"DYNAMIC",new float[] {(x-(WIDTH/2)-8)*Shape.getScale()+cameraLocation[0],
+	    															   (y-(HEIGHT/2)-8)*Shape.getScale()+cameraLocation[1]} ,1);
 	    shapeList.add(roid);
 	    
 	    

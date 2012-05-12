@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import playn.core.*;
+import playn.core.ImmediateLayer.Renderer;
 
 /**
  * 
@@ -19,18 +20,42 @@ public class AssetManager {
 	
 	static Map<String,Image> imageMap = new HashMap<String, Image>(); //HashMap of image files
 	static Map<Integer,GameAsset> assetMap = new HashMap<Integer,GameAsset>(); //HashMap of game tiles
+	static Map<String,int[]> tilesetMap = new HashMap<String,int[]>();
 	static int lastKey = 0; //key used for current game tile
+	
+	public AssetManager() {
+		
+		//manually done elements on the tileset
+		tilesetMap.put("hull",new int[] {0,0});
+		tilesetMap.put("cargo",new int[] {1,0});
+		tilesetMap.put("thruster",new int[] {2,0});
+		tilesetMap.put("cpu",new int[] {3,0});
+		tilesetMap.put("capacitor",new int[] {4,0});
+		tilesetMap.put("fullcargo",new int[] {5,0});
+		tilesetMap.put("engine",new int[] {6,0});
+		tilesetMap.put("tractorbeam",new int[] {7,0});
+		tilesetMap.put("solarpane",new int[] {8,0});
+		tilesetMap.put("minithruster",new int[] {9,0});
+		tilesetMap.put("builder",new int[] {10,0});
+		tilesetMap.put("projgun",new int[] {11,0});
+		tilesetMap.put("coolant",new int[] {0,1});
+		tilesetMap.put("engine2",new int[] {1,1});
+		tilesetMap.put("???",new int[] {2,1});
+		tilesetMap.put("scoop",new int[] {3,1});
+		tilesetMap.put("armor",new int[] {4,1});
+		tilesetMap.put("radar",new int[] {5,1});
+		tilesetMap.put("asteroid",new int[] {6,1});
+	
+	}
 	
 	//creates a new asset
 	public int newAsset(String imageName, int depth) {
-		
 		
 		
 		lastKey++;//increases the current key index
 		
 		if (!imageMap.containsKey(imageName)) { //checks if the image requested is already loaded
 			loadImage(imageName); //if not, it loads the image.
-			System.out.println("loading file resources/"+imageName+".png"); //debug output
 		}
 		
 		//once the image is loaded, a new game asset is created with the image file, depth, and the current key index
@@ -40,7 +65,30 @@ public class AssetManager {
 	
 	//loads the image file requested
 	private void loadImage(String imageName) {
-		imageMap.put(imageName,assets().getImage("/images/"+imageName+".png"));
+		
+		if (tilesetMap.containsKey(imageName)) {
+			imageMap.put(imageName,fromTile(tilesetMap.get(imageName)));
+			System.out.println("loading tile " + imageName + " from tileset"); //debug output
+			return;
+		}
+		// else load from png
+	    imageMap.put(imageName,assets().getImage("/images/"+imageName+".png"));
+	    System.out.println("loading file resources/"+imageName+".png"); //debug output
+	}
+	
+	Image tileset = assets().getImage("/images/ships3.png");
+	
+	private Image fromTile(int[] loc) {
+		
+		System.out.println("loading tile from "+loc[0]*16+ ":"+ loc[1]*16);
+		CanvasImage finalImage = graphics().createImage(16,16);
+		Canvas C = finalImage.canvas();
+		C.drawImage(tileset, 0, 0, 16, 16, loc[0]*16, loc[1]*16, 16, 16);
+		
+		return finalImage;
+		
+		
+		
 	}
 	
 	//returns the game asset at a specified index
