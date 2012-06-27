@@ -19,35 +19,63 @@ import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.contacts.Contact;
 
 public class TestGame implements Game {
-	
+	  //sets the default screen width and height
 	  public static int WIDTH = 1440;
 	  public static int HEIGHT = 900;
-	  float scale = 2;
+	  
+	  //sets the scale for the game (not menu)
+	  //TODO: scrolling is broken
+	  static float scale = 2;
+	  
+	  //offset for the camera location, and what CPU the camera is focused on
 	  static float[] cameraLocation = new float[] {0,0};
 	  static int currentCamera = 0;
 	  
-	  float deltaX = 0;
-	  float deltaY = 0;
+	  //change in the mouse location since last tick
+	  float mouseDeltaX = 0;
+	  float mouseDeltaY = 0;
+	  
+	  //creates the basic menu object
 	  static MenuBar gameMenu;
+	  
+	  //waits before fireing up the game
 	  static boolean loaded = false;
+	  
+	  //is the simulation paused?
 	  static boolean paused = false;
+	  
+	  //determines the action of the mouse button
 	  static int mode;
+	  
+	  //the currently selected box and what it's touching
 	  static ShapeBody selectedBox;
 	  static ShapeBody contactingBox;
+	  
+	  //is the mouse currently moving a box?
 	  static boolean moving;
+	  
+	  //should the screen be horizontal or portrait
+	  //TODO: if statement to decide based on aspect ratio
 	  static boolean horizontal = true;
 	  
+	  //creates the physics world
 	  static World world;
 
+	  //creates the array of crafts/stellar objects
 	  static ArrayList<ShapeBody> shapeList = new ArrayList<ShapeBody>();
+	  //creates the array of player-owned CPU's
 	  static ArrayList<Shape> cpuList = new ArrayList<Shape>();
+	  //creates the array of contacting objects
 	  static ArrayList<Contact> contactArray = new ArrayList<Contact>();
 	  
+	  //creates the main game asset manager to handle tilesets and object loading
 	  public static AssetManager manager = new AssetManager();
 	  
   @Override
   public void init() {
-	  
+	
+	//sets screen size
+	//TODO: automate this task for varying screen sizes
 	graphics().setSize(WIDTH, HEIGHT);
 	
 	//creates the background layers and set it's size
@@ -61,6 +89,14 @@ public class TestGame implements Game {
 	//
 	// input handling
 	//
+	
+	//
+	//TODO: ponder if this is a good way to handle mouse input.
+	//the main game class has listeners for each event and 
+	//manipulates variables that affect how the game flows through
+	//each tick. however, would it be better if each occasion
+	//some form of input was needed, if a separate listener was
+	//implemented for it in the desired function?
 	
     //create a mouse listener to handle the mousewheel
     mouse().setListener(new Mouse.Adapter() {
@@ -80,8 +116,8 @@ public class TestGame implements Game {
     	
     	public void onPointerStart(Pointer.Event event) {
     		//set new start location
-    		deltaX = event.x();
-    		deltaY = event.y();
+    		mouseDeltaX = event.x();
+    		mouseDeltaY = event.y();
     		mouseDown(event.x(), event.y());
     	}
     	
@@ -89,8 +125,8 @@ public class TestGame implements Game {
     		//compares current location with last location and pans
     		
     		//sets new delta for next update
-    		deltaX = event.x();
-    		deltaY = event.y();
+    		mouseDeltaX = event.x();
+    		mouseDeltaY = event.y();
     		if (moving && selectedBox != null) {
     			moveBox(event.x(),event.y());
     		}
